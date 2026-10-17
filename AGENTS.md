@@ -307,3 +307,7 @@ doc that has gone stale loses nothing. A stale doc that stays costs every future
 - `CONTRIBUTING.md` and the README's Contributing section cover the dev-environment setup (`cp docker/example.env docker/.env`, `pnpm install`, `mise dev`).
 - User-facing docs live in `docs/docs/` and are deployed to `docs.opennoodle.de`. Run prettier on any markdown under `docs/` before committing; CI Docs Build is strict. `specs/` is outside `docs/` precisely so it is _not_ prettier-gated and does not trigger the Docs Build workflow.
 - Guides for switching to / from Gallery live under `docs/docs/guides/`; the switch-back-to-immich script is `scripts/revert-to-immich.sql`.
+
+## SDS fork
+
+This checkout is the SDS fork (`danielboven/sds-noodle-gallery`). All SDS changes live on the `sds` branch as a few small commits on top of a Gallery release tag; `main` mirrors upstream. Read `SDS.md` before changing anything SDS-related or moving the `sds` branch to a new Gallery version: it lists what each SDS commit touches, the house style, and the step-by-step update, build and deploy procedure. Keep SDS code in new files (`web/src/styles/sds-theme.css`, `web/src/lib/sds/`, `.github/workflows/sds-*.yml`) and limit edits to Gallery files to single lines.
