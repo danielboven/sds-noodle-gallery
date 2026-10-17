@@ -169,18 +169,18 @@ describe('/admin/users', () => {
   describe('PUT /admin/users/:id/preferences', () => {
     it('should update memories enabled', async () => {
       const before = await getUserPreferencesAdmin({ id: admin.userId }, { headers: asBearerAuth(admin.accessToken) });
-      expect(before).toMatchObject({ memories: { enabled: true } });
+      expect(before).toMatchObject({ memories: { enabled: false } });
 
       const { status, body } = await request(app)
         .put(`/admin/users/${admin.userId}/preferences`)
-        .send({ memories: { enabled: false } })
+        .send({ memories: { enabled: true } })
         .set('Authorization', `Bearer ${admin.accessToken}`);
 
       expect(status).toBe(200);
-      expect(body).toMatchObject({ memories: { enabled: false } });
+      expect(body).toMatchObject({ memories: { enabled: true } });
 
       const after = await getUserPreferencesAdmin({ id: admin.userId }, { headers: asBearerAuth(admin.accessToken) });
-      expect(after).toMatchObject({ memories: { enabled: false } });
+      expect(after).toMatchObject({ memories: { enabled: true } });
     });
 
     it('should update download archive size', async () => {

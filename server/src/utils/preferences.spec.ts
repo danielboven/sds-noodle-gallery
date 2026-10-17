@@ -13,7 +13,7 @@ const getDefaultPreferences = (): UserPreferences => ({
     sidebarWeb: false,
   },
   memories: {
-    enabled: true,
+    enabled: false,
     duration: 5,
     sidebarWeb: true,
     types: {
@@ -32,7 +32,7 @@ const getDefaultPreferences = (): UserPreferences => ({
     },
   },
   people: {
-    enabled: true,
+    enabled: false,
     sidebarWeb: false,
     minimumFaces: 3,
     updateStrategy: PersonUpdateStrategy.Everyone,
@@ -45,8 +45,8 @@ const getDefaultPreferences = (): UserPreferences => ({
     enabled: false,
   },
   tags: {
-    enabled: false,
-    sidebarWeb: false,
+    enabled: true,
+    sidebarWeb: true,
   },
   emailNotifications: {
     enabled: true,
@@ -131,7 +131,7 @@ describe('getPreferences', () => {
     expect(result.folders.enabled).toBe(true);
     expect(result.folders.sidebarWeb).toBe(true);
     expect(result.tags.enabled).toBe(true);
-    expect(result.tags.sidebarWeb).toBe(false);
+    expect(result.tags.sidebarWeb).toBe(true);
     expect(result.ratings.enabled).toBe(true);
   });
 
@@ -233,20 +233,20 @@ describe('getPreferencesPartial', () => {
 
   it('should return only the changed properties', () => {
     const preferences = getDefaultPreferences();
-    preferences.memories.enabled = false;
+    preferences.memories.enabled = true;
     const result = getPreferencesPartial(preferences);
-    expect(result).toEqual({ memories: { enabled: false } });
+    expect(result).toEqual({ memories: { enabled: true } });
   });
 
   it('should return multiple changed properties across sections', () => {
     const preferences = getDefaultPreferences();
     preferences.folders.enabled = true;
-    preferences.tags.enabled = true;
+    preferences.tags.enabled = false;
     preferences.ratings.enabled = true;
     const result = getPreferencesPartial(preferences);
     expect(result).toEqual({
       folders: { enabled: true },
-      tags: { enabled: true },
+      tags: { enabled: false },
       ratings: { enabled: true },
     });
   });
@@ -328,7 +328,7 @@ describe('mergePreferences', () => {
     expect(result.folders.enabled).toBe(true);
     expect(result.folders.sidebarWeb).toBe(true);
     expect(result.people.sidebarWeb).toBe(true);
-    expect(result.people.enabled).toBe(true);
+    expect(result.people.enabled).toBe(false);
     expect(result.cast.gCastEnabled).toBe(true);
   });
 
