@@ -1,0 +1,138 @@
+/* web/src/styles/sds-theme.css
+ * SDS house style on top of the Gallery theme. Imported by web/src/app.css
+ * right AFTER gallery-theme.css, so the same selectors win on source order.
+ * Only token values change here; gallery-theme.css itself stays untouched so
+ * rebases onto new Gallery releases do not conflict.
+ *
+ * SDS colours: red #e6001c (primary), metal #323240 (dark-mode chrome).
+ * Fonts: Montserrat for text, Genos Medium (500) for headings and album titles.
+ */
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('$lib/assets/fonts/Montserrat/Montserrat.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('$lib/assets/fonts/Montserrat/Montserrat-Italic.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Genos';
+  src: url('$lib/assets/fonts/Genos/Genos.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Unlayered on :root rather than in @theme: app.css declares its own @theme
+ * --font-sans (GoogleSans) after the theme imports, which would win over an
+ * @theme value here. An unlayered :root value beats Tailwind's theme layer. */
+:root {
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Genos', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* gallery-theme.css gives h1-h4 the display font. Genos is narrow, so SDS keeps
+ * it for the big titles only (h1: album/space/page titles, login), at Medium.
+ * Section headings (h2-h4: settings panels, modals) go back to Montserrat with
+ * their own weights. Unlayered, so this beats gallery-theme.css and the
+ * font-bold / font-semibold utilities on titles. */
+h1 {
+  font-weight: 500;
+}
+
+h2,
+h3,
+h4 {
+  font-family: var(--font-sans);
+}
+
+/* Light: SDS red ramp. 500 is the brand red (4.8:1 on white). */
+:root,
+.light {
+  --immich-ui-primary-50: #fff0f1;
+  --immich-ui-primary-100: #ffdde0; /* primary container */
+  --immich-ui-primary-200: #ffc0c6;
+  --immich-ui-primary-300: #ff949e;
+  --immich-ui-primary-400: #ff5767;
+  --immich-ui-primary-500: #e6001c; /* SDS red — button fill, accent */
+  --immich-ui-primary-600: #c80018; /* solid accent: focus, links */
+  --immich-ui-primary-700: #a50014;
+  --immich-ui-primary-800: #880012;
+  --immich-ui-primary-900: #730014;
+  --immich-ui-primary-950: #400006; /* on-primary-container */
+  --immich-primary: 230 0 28; /* #e6001c (legacy rgb) */
+  --immich-dark-primary: 255 84 92; /* #ff545c (dark, legacy rgb) */
+  --immich-dark-bg: 28 28 37; /* #1c1c25 — metal content */
+  --immich-dark-gray: 50 50 64; /* #323240 — SDS metal */
+}
+
+/* Dark: a lighter red accent, because the brand red #e6001c is only 2.6:1 on
+ * the metal chrome. #ff545c (hue 357°, a touch warmer than the brand's 353° so
+ * it stays red rather than pink) is 4.0:1 on the metal and 5.4:1 on the
+ * content panel. Metal chrome (#323240) with a darker metal content panel.
+ * Ramp is inverted like Gallery's: lower = darker container reds. */
+.dark {
+  --immich-ui-primary-950: #ffe5e7;
+  --immich-ui-primary-900: #ffcccf;
+  --immich-ui-primary-800: #ffadb1;
+  --immich-ui-primary-700: #ff8f94;
+  --immich-ui-primary-600: #ff7077;
+  --immich-ui-primary-500: #ff545c; /* red accent (4.0:1 on #323240, 5.4:1 on #1c1c25) */
+  --immich-ui-primary-400: #ff1a25;
+  --immich-ui-primary-300: #e6001c; /* SDS red */
+  --immich-ui-primary-200: #b80016;
+  --immich-ui-primary-100: #7a000f;
+  --immich-ui-primary-50: #3d0008;
+  --immich-ui-light: #1c1c25; /* content panel — darker than the chrome */
+  --immich-ui-gray: #414154; /* subtle surface — lighter than chrome so hovers show */
+  --immich-ui-default-border: #4a4a5e;
+  --gallery-chrome: #323240; /* navbar + sidebar in SDS metal */
+  --immich-ui-muted: #9e9eaa; /* secondary text, metal-tinted */
+
+  /* @immich/ui neutral ramps (bars, cards, borders, scrollbars, text) and
+   * Gallery's gray ramp, re-tinted to the metal hue at the same lightness so
+   * nothing in dark mode is plain neutral grey. light-100 (control bars,
+   * cards) matches the content panel. */
+  --immich-ui-light-50: #090914;
+  --immich-ui-light-100: #1c1c25;
+  --immich-ui-light-200: #252532;
+  --immich-ui-light-300: #3e3e4d;
+  --immich-ui-light-400: #505160;
+  --immich-ui-light-500: #717282;
+  --immich-ui-light-600: #a0a0a8;
+  --immich-ui-light-700: #d3d3dc;
+  --immich-ui-light-800: #e4e4ed;
+  --immich-ui-light-900: #f4f4fd;
+  --immich-ui-light-950: #f9f9ff;
+  --immich-ui-dark-50: #f9f9ff;
+  --immich-ui-dark-100: #f4f4fd;
+  --immich-ui-dark-200: #e4e4ed;
+  --immich-ui-dark-300: #d3d3dc;
+  --immich-ui-dark-400: #a0a0a8;
+  --immich-ui-dark-500: #717282;
+  --immich-ui-dark-600: #505160;
+  --immich-ui-dark-700: #3e3e4d;
+  --immich-ui-dark-800: #252532;
+  --immich-ui-dark-900: #161622;
+  --immich-ui-dark-950: #090914;
+  --color-gray-50: #f9f9ff;
+  --color-gray-100: #f3f3fa;
+  --color-gray-200: #ededf4;
+  --color-gray-300: #e1e2e9;
+  --color-gray-400: #c0c0c7;
+  --color-gray-500: #9e9eaa;
+  --color-gray-600: #616171;
+  --color-gray-700: #3d3d4c;
+  --color-gray-800: #2d2d3a;
+  --color-gray-900: #1e1d2a;
+  --color-gray-950: #12121e;
+}
