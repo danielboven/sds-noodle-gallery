@@ -498,17 +498,17 @@ describe(UserAdminService.name, () => {
       mocks.user.getMetadata.mockResolvedValue([
         {
           key: UserMetadataKey.Preferences,
-          value: { memories: { enabled: true } },
+          value: { memories: { enabled: false } },
         },
       ] as any);
 
       await sut.updatePreferences(authStub.admin, userStub.user1.id, {
-        memories: { enabled: false },
+        memories: { enabled: true },
       });
 
       expect(mocks.user.upsertMetadata).toHaveBeenCalledWith(userStub.user1.id, {
         key: UserMetadataKey.Preferences,
-        value: expect.objectContaining({ memories: expect.objectContaining({ enabled: false }) }),
+        value: expect.objectContaining({ memories: expect.objectContaining({ enabled: true }) }),
       });
     });
   });
