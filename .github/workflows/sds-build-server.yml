@@ -1,0 +1,96 @@
+name: SDS Build Server
+
+# Builds the SDS server image (web + API) for 64-bit Intel/AMD (linux/amd64)
+# and pushes it to ghcr.io/<owner>/sds-noodle-gallery-server.
+#
+# Run it by pushing a tag `sds-<gallery version>`, e.g. `sds-v5.9.0-rc.0`
+# (a rebuild of the same base: `sds-v5.9.0-rc.0_2`), or by hand from the
+# Actions tab (needs this file on the repository's default branch).
+# The machine-learning image is not rebuilt: use open-noodle's gallery-ml.
+
+on:
+  push:
+    tags:
+      - 'sds-v*'
+  workflow_dispatch:
+    inputs:
+      gallery_version:
+        description: 'Gallery version this branch is based on (stamped into the server)'
+        required: true
+        default: 'v5.9.0-rc.0'
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build server (linux/amd64)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository_owner }}/sds-noodle-gallery-server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Version and image tags
+        id: tags
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.gallery_version }}
+        run: |
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            # sds-v5.9.0-rc.0_2 -> v5.9.0-rc.0
+            version="${REF_NAME#sds-}"
+            version="${version%%_*}"
+            image_tag="${REF_NAME#sds-}"
+          else
+            version="$INPUT_VERSION"
+            image_tag="${version}-dev"
+          fi
+          if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::'$version' is not a Gallery version like v5.9.0-rc.0"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tags=${IMAGE}:${image_tag},${IMAGE}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+      - name: Login to GHCR
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply branding
+        uses: ./.github/actions/apply-branding
+        with:
+          version: ${{ steps.tags.outputs.version }}
+
+      - name: Build and push
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: server/Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            DEVICE=cpu
+            BUILD_ID=${{ github.run_id }}
+            BUILD_SOURCE_REF=${{ github.ref_name }}
+            BUILD_SOURCE_COMMIT=${{ github.sha }}
+          tags: ${{ steps.tags.outputs.tags }}
+          push: true
+          cache-from: type=gha,scope=sds-server-amd64
+          cache-to: type=gha,scope=sds-server-amd64,mode=max
