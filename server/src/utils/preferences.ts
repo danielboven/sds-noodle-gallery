@@ -16,13 +16,13 @@ const getDefaultPreferences = (): UserPreferences => {
       sidebarWeb: false,
     },
     memories: {
-      enabled: true,
+      enabled: false,
       duration: 5,
       types: buildDefaultMemoryTypeMap(),
       sidebarWeb: true,
     },
     people: {
-      enabled: true,
+      enabled: false,
       sidebarWeb: false,
       minimumFaces: 3,
       updateStrategy: PersonUpdateStrategy.Everyone,
@@ -35,8 +35,8 @@ const getDefaultPreferences = (): UserPreferences => {
       enabled: false,
     },
     tags: {
-      enabled: false,
-      sidebarWeb: false,
+      enabled: true,
+      sidebarWeb: true,
     },
     emailNotifications: {
       enabled: true,

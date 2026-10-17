@@ -217,9 +217,9 @@ describe(UserService.name, () => {
       const { user } = await ctx.newUser();
       const auth = factory.auth({ user: { id: user.id } });
 
-      const dto = { memories: { enabled: false } };
+      const dto = { memories: { enabled: true } };
 
-      await expect(sut.getMyPreferences(auth)).resolves.toMatchObject({ memories: { enabled: true } });
+      await expect(sut.getMyPreferences(auth)).resolves.toMatchObject({ memories: { enabled: false } });
       await expect(sut.updateMyPreferences(auth, dto)).resolves.toMatchObject(dto);
       await expect(sut.getMyPreferences(auth)).resolves.toMatchObject(dto);
     });
