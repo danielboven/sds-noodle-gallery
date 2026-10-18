@@ -15,7 +15,7 @@ import { LoggingRepository } from 'src/repositories/logging.repository.js';
 import { DB } from 'src/schema/index.js';
 import { TagAssetTable } from 'src/schema/tables/tag-asset.table.js';
 import { TagTable } from 'src/schema/tables/tag.table.js';
-import { asUuid } from 'src/utils/database.js';
+import { sharedTagOwnerId } from 'src/sds/shared-tags.js';
 import { sharedWithViewer } from 'src/utils/shared-space-album-scope.js';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class TagRepository {
     return this.db
       .selectFrom('tag')
       .select(columns.tag)
-      .where('userId', '=', userId)
+      .where('userId', '=', sharedTagOwnerId(this.db)) // SDS: shared tags
       .where('value', '=', value)
       .executeTakeFirst();
   }
@@ -61,7 +61,7 @@ export class TagRepository {
     return this.insertTagWithClosures((db) =>
       db
         .insertInto('tag')
-        .values({ userId, value, parentId })
+        .values({ userId: sharedTagOwnerId(this.db), value, parentId }) // SDS: shared tags, the userId argument is ignored
         .onConflict((oc) => oc.columns(['userId', 'value']).doUpdateSet({ parentId }))
         .returningAll(),
     );
@@ -81,7 +81,7 @@ export class TagRepository {
   // asset shared with them through a space they are a member of (issue #647).
   private ownedOrSpaceAccessible(eb: ExpressionBuilder<DB, 'tag'>, userId: string) {
     return eb.or([
-      eb('tag.userId', '=', asUuid(userId)),
+      eb('tag.userId', '=', sharedTagOwnerId(this.db)), // SDS: shared tags
       eb.exists(
         eb
           .selectFrom('tag_asset')
@@ -94,7 +94,12 @@ export class TagRepository {
 
   @GenerateSql({ params: [{ userId: DummyValue.UUID, color: DummyValue.STRING, value: DummyValue.STRING }] })
   create(tag: Insertable<TagTable>) {
-    return this.insertTagWithClosures((db) => db.insertInto('tag').values(tag).returningAll());
+    return this.insertTagWithClosures((db) =>
+      db
+        .insertInto('tag')
+        .values({ ...tag, userId: sharedTagOwnerId(this.db) })
+        .returningAll(),
+    ); // SDS: shared tags
   }
 
   @GenerateSql({ params: [DummyValue.UUID, { value: DummyValue.STRING, color: DummyValue.STRING }] })

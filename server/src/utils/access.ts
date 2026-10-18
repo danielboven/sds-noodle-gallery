@@ -6,6 +6,7 @@ import { AlbumUserRole, Permission } from 'src/enum.js';
 import { withGalleryGrants } from 'src/gallery/utils/access-grants.js';
 import { AccessRepository } from 'src/repositories/access.repository.js';
 import { PersonId } from 'src/repositories/person.repository.js';
+import { canChangeSharedTags } from 'src/sds/shared-tags.js';
 import { areSetsEqual, isSetSuperset, setDifference, setUnion } from 'src/utils/set.js';
 
 export type GrantedRequest = {
@@ -324,7 +325,8 @@ const checkOtherAccess = async (access: AccessRepository, request: OtherAccessRe
     case Permission.TagRead:
     case Permission.TagUpdate:
     case Permission.TagDelete: {
-      return await access.tag.checkOwnerAccess(auth.user.id, ids);
+      // SDS: shared tags
+      return canChangeSharedTags(auth, permission) ? await access.tag.checkOwnerAccess(auth.user.id, ids) : new Set();
     }
 
     case Permission.TimelineRead: {

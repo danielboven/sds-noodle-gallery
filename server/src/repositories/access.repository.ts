@@ -12,6 +12,7 @@ import {
 } from 'src/gallery/repositories/access.repository.js';
 import { PersonId } from 'src/repositories/person.repository.js';
 import { DB } from 'src/schema/index.js';
+import { sharedTagOwnerId } from 'src/sds/shared-tags.js';
 import { asUuid } from 'src/utils/database.js';
 import {
   asBaseEb,
@@ -680,7 +681,7 @@ class TagAccess {
       .selectFrom('tag')
       .select('tag.id')
       .where('tag.id', 'in', [...tagIds])
-      .where('tag.userId', '=', userId)
+      .where('tag.userId', '=', sharedTagOwnerId(this.db)) // SDS: shared tags
       .execute()
       .then((tags) => new Set(tags.map((tag) => tag.id)));
   }

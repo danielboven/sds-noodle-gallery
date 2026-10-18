@@ -137,11 +137,13 @@ export class TagService extends BaseService {
 
   async removeAssets(auth: AuthDto, id: string, dto: BulkIdsDto): Promise<BulkIdResponseDto[]> {
     await this.requireAccess({ auth, permission: Permission.TagAsset, ids: [id] });
+    // SDS: shared tags, anyone who may edit a photo may remove a tag from it
+    const assetIds = [...(await this.checkAccess({ auth, permission: Permission.AssetUpdate, ids: dto.ids }))];
 
     const results = await removeAssets(
       auth,
       { access: this.accessRepository, bulk: this.tagRepository },
-      { parentId: id, assetIds: dto.ids, canAlwaysRemove: Permission.TagDelete },
+      { parentId: id, assetIds, canAlwaysRemove: Permission.TagAsset }, // SDS: shared tags
     );
 
     for (const { id: assetId, success } of results) {
