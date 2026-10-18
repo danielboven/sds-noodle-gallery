@@ -293,7 +293,7 @@ export class MetadataService extends BaseService {
       }
     }
 
-    const tags = ignoreFileTags(this.getTagList(exifTags)); // SDS: tags never come from files
+    const tags = this.getTagList(exifTags);
 
     const exifData: Insertable<AssetExifTable> = {
       assetId: asset.id,
@@ -692,6 +692,8 @@ export class MetadataService extends BaseService {
         mediaTags.Orientation = orientation;
       }
     }
+
+    ignoreFileTags(mediaTags, sidecarTags); // SDS: only Gallery's own TagsList in the sidecar counts
 
     return {
       tags: { ...mediaTags, ...videoResult?.tags, ...sidecarTags },
