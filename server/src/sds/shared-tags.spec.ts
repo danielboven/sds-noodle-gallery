@@ -1,5 +1,5 @@
 import { Permission } from 'src/enum.js';
-import { canChangeSharedTags } from 'src/sds/shared-tags.js';
+import { canChangeSharedTags, ignoreFileTags } from 'src/sds/shared-tags.js';
 import { authStub } from 'test/fixtures/auth.stub.js';
 
 describe('SDS shared tags', () => {
@@ -13,5 +13,9 @@ describe('SDS shared tags', () => {
     expect(canChangeSharedTags(authStub.user1, Permission.TagDelete)).toBe(false);
     expect(canChangeSharedTags(authStub.admin, Permission.TagUpdate)).toBe(true);
     expect(canChangeSharedTags(authStub.admin, Permission.TagDelete)).toBe(true);
+  });
+
+  it('never takes tags from files', () => {
+    expect(ignoreFileTags(['Soort/Dakkapel', 'Keyword'])).toEqual([]);
   });
 });

@@ -31,6 +31,7 @@ import { ReverseGeocodeResult } from 'src/repositories/map.repository.js';
 import { ImmichTags } from 'src/repositories/metadata.repository.js';
 import { AssetExifTable } from 'src/schema/tables/asset-exif.table.js';
 import { AssetFaceTable } from 'src/schema/tables/asset-face.table.js';
+import { ignoreFileTags } from 'src/sds/shared-tags.js';
 import { BaseService } from 'src/services/base.service.js';
 import { getAssetFiles } from 'src/utils/asset.util.js';
 import { isAssetChecksumConstraint } from 'src/utils/database.js';
@@ -292,7 +293,7 @@ export class MetadataService extends BaseService {
       }
     }
 
-    const tags = this.getTagList(exifTags);
+    const tags = ignoreFileTags(this.getTagList(exifTags)); // SDS: tags never come from files
 
     const exifData: Insertable<AssetExifTable> = {
       assetId: asset.id,
