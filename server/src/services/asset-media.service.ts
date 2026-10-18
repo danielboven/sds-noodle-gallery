@@ -33,6 +33,7 @@ import {
 import { videoPlaybackCacheControl } from 'src/gallery/utils/video-playback.js';
 import { StorageBackend } from 'src/interfaces/storage-backend.interface.js';
 import { AuthRequest } from 'src/middleware/auth.guard.js';
+import { addToUploadSpace, requireUploadSpaceEditor } from 'src/sds/upload-space.js';
 import { BaseService } from 'src/services/base.service.js';
 import { StorageService } from 'src/services/storage.service.js';
 import { requireUploadAccess } from 'src/utils/access.js';
@@ -154,6 +155,7 @@ export class AssetMediaService extends BaseService {
       });
 
       this.requireQuota(auth, file.size);
+      await requireUploadSpaceEditor(this.sharedSpaceRepository, auth); // SDS: uploads only for space editors
 
       if (dto.livePhotoVideoId) {
         await onBeforeLink(
@@ -162,6 +164,7 @@ export class AssetMediaService extends BaseService {
         );
       }
       asset = await this.create(auth.user.id, dto, file, sidecarFile);
+      await addToUploadSpace(this.sharedSpaceRepository, auth, asset.id); // SDS: every upload joins the space
 
       if (auth.sharedLink) {
         await this.addToSharedLink(auth.sharedLink, asset.id);
