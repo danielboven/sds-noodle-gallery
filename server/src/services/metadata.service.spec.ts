@@ -28,6 +28,12 @@ import { getForMetadataExtraction, getForSidecarWrite } from 'test/mappers.js';
 import { factory } from 'test/small.factory.js';
 import { ServiceMocks, makeStream, newTestService } from 'test/utils.js';
 
+// SDS: production ignores tags from files (src/sds/shared-tags.ts); keep Gallery's parsing tests as they are.
+vi.mock('src/sds/shared-tags.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('src/sds/shared-tags.js')>()),
+  ignoreFileTags: (fileTags: string[]) => fileTags,
+}));
+
 const forSidecarJob = (
   asset: {
     id?: string;

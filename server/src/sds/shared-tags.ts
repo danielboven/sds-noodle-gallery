@@ -19,3 +19,7 @@ export const sharedTagOwnerId = (db: Kysely<DB>) =>
 // so that stays with admins.
 export const canChangeSharedTags = (auth: AuthDto, permission: Permission) =>
   auth.user.isAdmin || (permission !== Permission.TagUpdate && permission !== Permission.TagDelete);
+
+// SDS: tags are never read from the files (keywords in the photo or its XMP sidecar). They are only
+// set in Gallery or through the API.
+export const ignoreFileTags = (_fileTags: string[]): string[] => [];
