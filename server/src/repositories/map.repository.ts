@@ -13,6 +13,7 @@ import { SystemMetadataRepository } from 'src/repositories/system-metadata.repos
 import { DB } from 'src/schema/index.js';
 import { GeodataPlacesTable } from 'src/schema/tables/geodata-places.table.js';
 import { NaturalEarthCountriesTable } from 'src/schema/tables/natural-earth-countries.table.js';
+import { pdokReverseGeocode } from 'src/sds/pdok-geocode.js';
 import { favoriteExistsFor } from 'src/utils/favorite.js';
 import {
   type ViewerSpaces,
@@ -183,6 +184,11 @@ export class MapRepository {
     this.logger.debug(`Request: ${point.latitude},${point.longitude}`);
 
     const countryNames = await this.loadCountryNames();
+    // SDS: Dutch place names from PDOK when SDS_PDOK_GEOCODING=true, otherwise or on failure GeoNames below
+    const pdok = await pdokReverseGeocode(point, this.logger);
+    if (pdok) {
+      return { country: countryNames.byAlpha2.get('NL') ?? null, ...pdok };
+    }
 
     const response = await this.db
       .selectFrom('geodata_places')
