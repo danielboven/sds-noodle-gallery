@@ -17,6 +17,7 @@ The rule: SDS code goes in **new files**, and Gallery files only get **single-li
 | `docs(sds): …` | **new** `SDS.md`; `AGENTS.md` (pointer section at the end; `CLAUDE.md` is a symlink to it) | This guide |
 | `feat(sds): shared tags for all users` | **new** `server/src/sds/shared-tags.ts` (+ spec, + `server/test/medium/specs/sds/shared-tags.spec.ts`); one-line hooks in `server/src/repositories/tag.repository.ts` (4×), `server/src/repositories/access.repository.ts` (`TagAccess`), `server/src/utils/access.ts` (`Tag*` case), `server/src/services/tag.service.ts` (`removeAssets`), `web/src/lib/components/asset-viewer/DetailPanelTags.svelte` (`onClose`); specs `server/src/services/tag.service.spec.ts`, `web/src/lib/components/asset-viewer/DetailPanelTags.spec.ts` | One tag list for everyone (see "SDS behaviour" below) |
 | `feat(sds): never read tags from files` + `fix(sds): keep Gallery's own tags when re-reading the sidecar` | `server/src/sds/shared-tags.ts` (`ignoreFileTags`, + `server/test/medium/specs/sds/file-tags.spec.ts`); `server/src/services/metadata.service.ts` (1 line in `getExifTags`); `server/src/services/metadata.service.spec.ts` (`vi.mock` block at the top) | Keywords embedded in files never become tags |
+| `feat(sds): Dutch place names from PDOK` | **new** `server/src/sds/pdok-geocode.ts` (+ spec, + `server/test/medium/specs/sds/pdok-geocode.spec.ts`); `server/src/repositories/map.repository.ts` (4 lines at the top of `reverseGeocode`) | Place names from PDOK, GeoNames as fallback |
 | `feat(sds): every upload goes into the SDS space` | **new** `server/src/sds/upload-space.ts` (+ spec); `server/src/services/asset-media.service.ts` (2 lines in `uploadAsset`) | Uploads only for space Owners/Editors, and each upload joins the space |
 
 List them at any time with `git log --oneline <base-tag>..sds`, and see the full diff with `git diff --stat <base-tag>..sds`.
@@ -28,6 +29,7 @@ All SDS hooks in Gallery files carry an `// SDS` comment, so `git grep -n "SDS" 
 - **Shared tags.** Every tag is stored under one account, the **oldest admin** (the account created at install), instead of under the user who typed it. Everybody sees and attaches the same tags; renaming and deleting a tag is for admins only; anyone who may edit a photo may remove a tag from it. **Never delete that account or take away its admin rights**: the tags belong to it (the database deletes them with the user).
 - **No tags from files.** Keywords embedded in a photo (`Keywords`, `HierarchicalSubject`, `TagsList`) are ignored, and so are `Keywords`/`HierarchicalSubject` in an XMP sidecar. Only `TagsList` in the sidecar is read: that is where Gallery writes the tags set in Gallery or through the API, and after every tag change it writes the sidecar, unlocks the tags and reads them back from there. Dropping that too wipes every tag (the bug fixed in `fix(sds): keep Gallery's own tags…`). The import scripts use `PUT /tags` + `PUT /tags/assets`.
 - **Uploads go into the space.** With `SDS_UPLOAD_SPACE_ID=<space id>` in the server's `.env`, only Owners and Editors of that space may upload, and every upload is added to it at once. Without the variable Gallery behaves as normal. The space id is the last part of the space's URL (`/spaces/<id>`).
+- **Place names from PDOK.** With `SDS_PDOK_GEOCODING=true`, reverse geocoding (on metadata extraction and when a location is set by hand) first asks PDOK's Locatieserver (`api.pdok.nl/bzk/locatieserver/search/v3_1/reverse`, `type=woonplaats`) for the BAG woonplaats the point lies in: Wezep, not the gemeente Oldebroek; province from PDOK too. It only counts when the point lies inside a woonplaats (`afstand` 0). Abroad, any error, an odd answer or no answer within 2 seconds falls back to Gallery's own GeoNames lookup, so PDOK being down only means less precise names. Water areas belong to a woonplaats in the BAG (IJsselmeer → Mirns). PDOK writes Frisian `Fryslân` where GeoNames says `Friesland`. Existing photos get the new names with Administration → Jobs → Extract metadata → All. A failure logs a warning `PDOK reverse geocoding … falling back to GeoNames`.
 - Upstream tests that pin per-user tags fail on purpose (for example "should not return a tag of another user" in `server/test/medium/specs/services/tag.service.spec.ts` and `test/medium/specs/repositories/tag.repository.spec.ts`, which also create no admin). The SDS behaviour is covered by `server/src/sds/*.spec.ts` and `server/test/medium/specs/sds/`.
 
 ### SDS house style (reference)
@@ -86,7 +88,7 @@ During a rebase, `--ours` is the new Gallery version and `--theirs` is the SDS c
 | `AlbumTitle.svelte` | Take Gallery's version and add `font-display font-medium` to the title classes again |
 | `web/src/hooks.client.ts` | Take Gallery's version and re-add `import '$lib/sds/sds-logos';` |
 | `AGENTS.md` (= `CLAUDE.md`) | Take Gallery's version and re-append the "SDS fork" section at the end |
-| `tag.repository.ts`, `access.repository.ts` (`TagAccess`), `utils/access.ts`, `tag.service.ts`, `metadata.service.ts`, `asset-media.service.ts`, `DetailPanelTags.svelte` | Take Gallery's version and re-apply the `// SDS` lines; `git show sds-backup-$OLD:<file> \| grep -n SDS` shows them |
+| `tag.repository.ts`, `access.repository.ts` (`TagAccess`), `utils/access.ts`, `tag.service.ts`, `metadata.service.ts`, `asset-media.service.ts`, `map.repository.ts`, `DetailPanelTags.svelte` | Take Gallery's version and re-apply the `// SDS` lines; `git show sds-backup-$OLD:<file> \| grep -n SDS` shows them |
 | `tag.service.spec.ts`, `metadata.service.spec.ts`, `DetailPanelTags.spec.ts` | Take Gallery's version and re-apply the `// SDS` lines (mock lines, the `vi.mock` block, test W-tags-1) |
 
 Then `git add <file>` and `git rebase --continue`. If it goes wrong: `git rebase --abort` (or `git reset --hard sds-backup-$OLD`).
@@ -113,7 +115,7 @@ git grep -n "SDS" -- server/src web/src | wc -l
 git grep -n "SDS" sds-backup-$OLD -- server/src web/src | wc -l
 
 # New ways to create or attach tags, or to upload, that bypass the hooks?
-git diff $OLD $NEW --stat -- server/src/repositories/tag.repository.ts server/src/services/tag.service.ts server/src/utils/tag.ts server/src/services/asset-media.service.ts
+git diff $OLD $NEW --stat -- server/src/repositories/tag.repository.ts server/src/services/tag.service.ts server/src/utils/tag.ts server/src/services/asset-media.service.ts server/src/repositories/map.repository.ts
 git diff $OLD $NEW -- server/src | grep -n "insertInto('tag')\|upsertTags(\|getTagList("
 ```
 
@@ -170,7 +172,7 @@ SDS_VERSION=$NEW       # ghcr.io/danielboven/sds-noodle-gallery-server
 IMMICH_VERSION=$NEW    # ghcr.io/open-noodle/gallery-ml
 ```
 
-Keep `SDS_UPLOAD_SPACE_ID` set to the SDS space's id.
+Keep `SDS_UPLOAD_SPACE_ID` set to the SDS space's id and `SDS_PDOK_GEOCODING=true`.
 
 Then `docker compose pull && docker compose up -d` and watch `docker compose logs -f immich-server`.
 
