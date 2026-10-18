@@ -1,6 +1,7 @@
 import { Kysely } from 'kysely';
 import { AuthDto } from 'src/dtos/auth.dto.js';
 import { Permission } from 'src/enum.js';
+import { ImmichTags } from 'src/repositories/metadata.repository.js';
 import { DB } from 'src/schema/index.js';
 
 // SDS: tags are shared by everyone. Every tag is stored under one fixed account, the oldest admin
@@ -20,6 +21,14 @@ export const sharedTagOwnerId = (db: Kysely<DB>) =>
 export const canChangeSharedTags = (auth: AuthDto, permission: Permission) =>
   auth.user.isAdmin || (permission !== Permission.TagUpdate && permission !== Permission.TagDelete);
 
-// SDS: tags are never read from the files (keywords in the photo or its XMP sidecar). They are only
-// set in Gallery or through the API.
-export const ignoreFileTags = (_fileTags: string[]): string[] => [];
+// SDS: tags never come from the photo itself (its embedded keywords). Gallery stores the tags set in
+// Gallery or through the API as TagsList in the XMP sidecar and reads them back from there after every
+// tag change (sidecar write, then metadata re-extraction), so TagsList in the sidecar is the only source
+// kept. Keywords and HierarchicalSubject in a sidecar come from other software and are dropped too.
+export const ignoreFileTags = (mediaTags: ImmichTags, sidecarTags?: ImmichTags | null) => {
+  delete mediaTags.TagsList;
+  for (const tags of [mediaTags, sidecarTags]) {
+    delete tags?.Keywords;
+    delete tags?.HierarchicalSubject;
+  }
+};

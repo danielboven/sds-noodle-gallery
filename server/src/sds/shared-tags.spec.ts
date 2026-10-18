@@ -15,7 +15,11 @@ describe('SDS shared tags', () => {
     expect(canChangeSharedTags(authStub.admin, Permission.TagDelete)).toBe(true);
   });
 
-  it('never takes tags from files', () => {
-    expect(ignoreFileTags(['Soort/Dakkapel', 'Keyword'])).toEqual([]);
+  it('never takes tags from the photo itself, only TagsList from the sidecar', () => {
+    const media = { Keywords: ['Embedded'], HierarchicalSubject: ['A|B'], TagsList: ['Embedded/List'], Make: 'Canon' };
+    const sidecar = { Keywords: ['Other app'], HierarchicalSubject: ['C|D'], TagsList: ['Soort/Dakkapel'] };
+    ignoreFileTags(media, sidecar);
+    expect(media).toEqual({ Make: 'Canon' });
+    expect(sidecar).toEqual({ TagsList: ['Soort/Dakkapel'] });
   });
 });
