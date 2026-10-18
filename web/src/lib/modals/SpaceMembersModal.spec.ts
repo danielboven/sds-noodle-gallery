@@ -110,6 +110,7 @@ describe('SpaceMembersModal', () => {
       spaceId,
       members: [ownerMember, editorMember, viewerMember],
       isOwner: true,
+      createdById: ownerMember.userId, // SDS: the creator keeps the badge
       onClose,
     });
 
@@ -131,6 +132,7 @@ describe('SpaceMembersModal', () => {
       spaceId,
       members: [ownerMember, editorMember],
       isOwner: true,
+      createdById: ownerMember.userId, // SDS: the creator keeps the badge
       onClose,
     });
 
