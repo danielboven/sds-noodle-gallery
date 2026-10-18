@@ -410,6 +410,7 @@ export const COMMAND_ITEMS: readonly CommandItem[] = [
         members: ctx.space.members,
         isOwner: true,
         spaceColor: ctx.space.raw.color ?? 'primary',
+        createdById: ctx.space.raw.createdById, // SDS: co-owners
       });
     },
   },

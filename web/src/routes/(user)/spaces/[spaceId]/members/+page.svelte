@@ -3,6 +3,7 @@
   import UserAvatar from '$lib/components/shared-components/UserAvatar.svelte';
   import RoleBadge from '$lib/components/spaces/role-badge.svelte';
   import SpaceAddMemberModal from '$lib/modals/SpaceAddMemberModal.svelte';
+  import { canChangeSpaceRole } from '$lib/sds/space-roles';
   import { authManager } from '$lib/managers/auth-manager.svelte';
   import { getAssetMediaUrl } from '$lib/utils';
   import { handleError } from '$lib/utils/handle-error';
@@ -89,11 +90,12 @@
             <p class="truncate text-sm font-medium">{member.name}</p>
             <p class="truncate text-xs text-gray-500">{member.email}</p>
           </div>
-          {#if isOwner && member.role !== 'owner'}
+          {#if isOwner && canChangeSpaceRole(member, authManager.user.id, space.createdById)}
             <Field class="w-28 shrink-0">
               <Select
                 value={member.role as string as SharedSpaceRole}
                 options={[
+                  { label: $t('owner'), value: SharedSpaceRole.Owner }, // SDS: co-owners
                   { label: $t('role_editor'), value: SharedSpaceRole.Editor },
                   { label: $t('role_viewer'), value: SharedSpaceRole.Viewer },
                   { label: $t('remove'), value: 'remove' },

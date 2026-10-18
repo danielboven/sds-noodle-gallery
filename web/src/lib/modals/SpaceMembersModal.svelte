@@ -2,6 +2,7 @@
   import UserAvatar from '$lib/components/shared-components/UserAvatar.svelte';
   import RoleBadge from '$lib/components/spaces/role-badge.svelte';
   import SpaceAddMemberModal from '$lib/modals/SpaceAddMemberModal.svelte';
+  import { canChangeSpaceRole, currentUserId } from '$lib/sds/space-roles';
   import { handleError } from '$lib/utils/handle-error';
   import {
     removeMember,
@@ -19,10 +20,11 @@
     members: SharedSpaceMemberResponseDto[];
     isOwner: boolean;
     spaceColor?: string | null;
+    createdById?: string; // SDS: co-owners
     onClose: (updatedMembers?: SharedSpaceMemberResponseDto[]) => void;
   }
 
-  let { spaceId, members: initialMembers, isOwner, spaceColor = 'primary', onClose }: Props = $props();
+  let { spaceId, members: initialMembers, isOwner, spaceColor = 'primary', createdById, onClose }: Props = $props();
   let members = $state([...initialMembers]);
 
   const toAvatarUser = (member: SharedSpaceMemberResponseDto) => ({
@@ -101,13 +103,14 @@
           <Text fontWeight="medium">{member.name}</Text>
           <Text size="tiny" color="muted">{member.email}</Text>
         </div>
-        {#if isOwner && member.role === 'owner'}
+        {#if isOwner && !canChangeSpaceRole(member, currentUserId(), createdById)}
           <RoleBadge role="owner" {spaceColor} />
         {:else if isOwner}
           <Field class="w-32 shrink-0">
             <Select
               value={member.role as string as SharedSpaceRole}
               options={[
+                { label: $t('owner'), value: SharedSpaceRole.Owner }, // SDS: co-owners
                 { label: $t('role_editor'), value: SharedSpaceRole.Editor },
                 { label: $t('role_viewer'), value: SharedSpaceRole.Viewer },
                 { label: $t('remove'), value: 'remove' },
