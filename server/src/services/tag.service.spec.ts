@@ -318,6 +318,7 @@ describe(TagService.name, () => {
 
   describe('removeAssets', () => {
     it('should throw an error for an invalid id', async () => {
+      mocks.access.asset.checkOwnerAccess.mockResolvedValue(new Set(['asset-1'])); // SDS
       mocks.tag.getAssetIds.mockResolvedValue(new Set());
       mocks.tag.removeAssetIds.mockResolvedValue();
       mocks.asset.getForUpdateTags.mockResolvedValue({ tags: [] });
@@ -328,6 +329,7 @@ describe(TagService.name, () => {
     });
 
     it('should accept accept ids that are tagged and reject the rest', async () => {
+      mocks.access.asset.checkOwnerAccess.mockResolvedValue(new Set(['asset-1', 'asset-2'])); // SDS
       mocks.tag.get.mockResolvedValue(tagStub.tag);
       mocks.tag.getAssetIds.mockResolvedValue(new Set(['asset-1']));
       mocks.tag.removeAssetIds.mockResolvedValue();

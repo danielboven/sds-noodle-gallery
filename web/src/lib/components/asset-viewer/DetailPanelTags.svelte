@@ -72,8 +72,9 @@
     </div>
     <section class="flex flex-wrap gap-1 pt-2" data-testid="detail-panel-tags">
       {#each tags as tag (tag.id)}
+        <!-- SDS: tags are shared, so whoever may edit the photo may remove them (canEdit, not isOwner) -->
         <Badge
-          onClose={isOwner ? () => handleRemove(tag.id) : undefined}
+          onClose={canEdit ? () => handleRemove(tag.id) : undefined}
           size="small"
           shape="round"
           translations={{ close: $t('remove_tag') }}

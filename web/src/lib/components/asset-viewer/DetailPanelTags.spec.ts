@@ -104,14 +104,11 @@ describe('DetailPanelTags', () => {
   // which has a space arm) but may not remove one (tag removal resolves to tag ownership, which
   // has none) — offering that control would present a 403-on-click button. `canEdit` therefore
   // widens ONLY the add-tag affordance; per-tag remove stays gated on the real `isOwner`.
-  it('W-tags-1: offers add-tag but no per-tag remove to a non-owner editor', () => {
+  // SDS: tags are shared, so an editor may remove them too
+  it('W-tags-1: offers add-tag and per-tag remove to a non-owner editor', () => {
     renderWithTooltips(DetailPanelTags, { asset: taggedAsset(), isOwner: false, canEdit: true });
 
-    const section = screen.getByTestId('detail-panel-tags');
-    // The add-tag control is the only button offered — one per tag badge would additionally
-    // appear if remove leaked, so this also proves no per-tag remove renders.
-    expect(within(section).queryAllByRole('button')).toHaveLength(1);
-    expect(screen.queryAllByLabelText('remove_tag', { exact: false })).toHaveLength(0);
+    expect(screen.queryAllByLabelText('remove_tag', { exact: false })).toHaveLength(taggedAsset().tags!.length);
   });
 
   it('still hides add-tag from a non-owner non-editor', () => {
