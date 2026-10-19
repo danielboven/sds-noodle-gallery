@@ -14,6 +14,7 @@
   import { assetViewerManager } from '$lib/managers/asset-viewer-manager.svelte';
   import { serverConfigManager } from '$lib/managers/server-config-manager.svelte';
   import MapSettingsModal from '$lib/modals/MapSettingsModal.svelte';
+  import { applySdsInitialView } from '$lib/sds/map-view';
   import { mapSettings } from '$lib/stores/preferences.store';
   import { getAssetMediaUrl, handlePromiseError } from '$lib/utils';
   import { getMapMarkers, getSpaceMapMarkers, type MapMarkerResponseDto } from '@immich/sdk';
@@ -389,6 +390,7 @@
     diffStyleUpdates={true}
     onload={(event: Map) => {
       event.setMaxZoom(18);
+      applySdsInitialView(event, { hash, center, zoom, bounds: initialBounds }); // SDS: open on the Netherlands
       event.on('click', handleMapClick);
       event.on('moveend', handleMoveEnd);
       if (!simplified) {
