@@ -14,7 +14,7 @@
   import { assetViewerManager } from '$lib/managers/asset-viewer-manager.svelte';
   import { serverConfigManager } from '$lib/managers/server-config-manager.svelte';
   import MapSettingsModal from '$lib/modals/MapSettingsModal.svelte';
-  import { applySdsInitialView } from '$lib/sds/map-view';
+  import { sdsInitialView } from '$lib/sds/map-view';
   import { mapSettings } from '$lib/stores/preferences.store';
   import { getAssetMediaUrl, handlePromiseError } from '$lib/utils';
   import { getMapMarkers, getSpaceMapMarkers, type MapMarkerResponseDto } from '@immich/sdk';
@@ -108,6 +108,7 @@
     }
     return bounds;
   })();
+  const sdsView = untrack(() => sdsInitialView({ center, zoom, bounds: initialBounds })); // SDS: start on the Netherlands
 
   let map: Map | undefined = $state();
   let marker: Marker | null = null;
@@ -382,15 +383,14 @@
     {hash}
     style=""
     class="h-full {rounded ? 'rounded-2xl' : 'rounded-none'}"
-    {zoom}
-    {center}
+    zoom={zoom ?? sdsView.zoom}
+    center={center ?? sdsView.center}
     bounds={initialBounds}
     fitBoundsOptions={{ padding: 50, maxZoom: 15 }}
     attributionControl={false}
     diffStyleUpdates={true}
     onload={(event: Map) => {
       event.setMaxZoom(18);
-      applySdsInitialView(event, { hash, center, zoom, bounds: initialBounds }); // SDS: open on the Netherlands
       event.on('click', handleMapClick);
       event.on('moveend', handleMoveEnd);
       if (!simplified) {
