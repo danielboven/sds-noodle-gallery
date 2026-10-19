@@ -14,7 +14,6 @@ import {
   getSpace,
   searchAssets,
   searchPerson,
-  searchPlaces,
   searchSmart,
   type AlbumNameDto,
   type MetadataSearchDto,
@@ -35,6 +34,7 @@ import { createFilterState } from '$lib/components/filter-panel/filter-panel';
 import { authManager } from '$lib/managers/auth-manager.svelte';
 import { featureFlagsManager } from '$lib/managers/feature-flags-manager.svelte';
 import { Route } from '$lib/route';
+import { searchPlacesWithPhotos } from '$lib/sds/place-search';
 import { addEntry, getEntries, makePlaceId, removeEntry, type RecentEntry } from '$lib/stores/cmdk-recent';
 import { getPhotosPersonFilterId, type PhotosPersonFilterReference } from '$lib/utils/photos-filter-options';
 import {
@@ -2944,7 +2944,7 @@ export class GlobalSearchManager {
       minQueryLength: 2,
       run: async (query, _mode, signal) => {
         try {
-          const results = await searchPlaces({ name: query }, { signal });
+          const results = await searchPlacesWithPhotos(query, { signal }); // SDS: places from the photos
           return results.length === 0
             ? { status: 'empty' }
             : { status: 'ok', items: results.slice(0, 3), total: results.length };

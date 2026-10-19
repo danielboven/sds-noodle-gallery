@@ -121,6 +121,13 @@ afterEach(() => {
   commandContextManager.setSelection(null);
 });
 
+// SDS: the palette's places come from src/lib/sds/place-search.ts; route it back to searchPlaces for these tests
+vi.mock('$lib/sds/place-search', async () => {
+  const { searchPlaces } = await import('@immich/sdk');
+  return {
+    searchPlacesWithPhotos: (name: string, opts: { signal?: AbortSignal }) => searchPlaces({ name }, opts),
+  };
+});
 vi.mock('@immich/sdk', async () => ({
   ...(await vi.importActual<typeof import('@immich/sdk')>('@immich/sdk')),
   searchSmart: vi.fn(),
