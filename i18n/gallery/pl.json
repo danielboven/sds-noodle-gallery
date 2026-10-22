@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Przekroczono czas dopasowań: {entity}",
   "cmdk_filter_use_as_filter": "Użyj jako filtra",
   "cmdk_helper": "Zacznij pisać: zdjęcia, osoby, miejsca, etykiety.",
+  "cmdk_mode_all": "Wszystko",
   "cmdk_mode_description": "Opis",
   "cmdk_mode_filename": "Nazwa pliku",
   "cmdk_mode_ocr": "OCR",

@@ -135,3 +135,9 @@ vi.mock('$env/dynamic/public', () => {
     },
   };
 });
+
+// SDS: Gallery's tests expect smart search as the default mode; lib/sds/hybrid-search.spec.ts tests the Alles default.
+vi.mock('$lib/sds/hybrid-search', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  sdsDefaultSearchMode: () => {},
+}));

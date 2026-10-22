@@ -15,7 +15,7 @@ describe('search-mode-control — rail variant', () => {
     render(SearchModeControl, { props: { variant: 'rail', mode: 'smart', onSelect: vi.fn() } });
 
     const values = (screen.getAllByRole('radio') as HTMLInputElement[]).map((radio) => radio.value);
-    expect(values).toEqual(['smart', 'metadata', 'description', 'ocr']);
+    expect(values).toEqual(['all', 'smart', 'metadata', 'description', 'ocr']); // SDS: 'all'
   });
 
   it('checks the radio matching the active mode', () => {
@@ -63,6 +63,7 @@ describe('search-mode-control — chip variant', () => {
     await user.click(screen.getByRole('button', { name: 'Search mode: Smart' }));
 
     expect(screen.getAllByRole('menuitemradio').map((item) => item.textContent?.trim())).toEqual([
+      'Everything', // SDS
       'Smart',
       'Filename',
       'Description',
@@ -185,7 +186,7 @@ describe('search-mode-control — chip menu dismissal', () => {
 
     await user.keyboard('{ArrowDown}');
 
-    expect(document.activeElement).toBe(screen.getByRole('menuitemradio', { name: 'Smart' }));
+    expect(document.activeElement).toBe(screen.getByRole('menuitemradio', { name: 'Everything' })); // SDS
   });
 
   it('wraps from the last item back to the first', async () => {
@@ -195,7 +196,7 @@ describe('search-mode-control — chip menu dismissal', () => {
     screen.getByRole('menuitemradio', { name: 'OCR' }).focus();
     await user.keyboard('{ArrowDown}');
 
-    expect(document.activeElement).toBe(screen.getByRole('menuitemradio', { name: 'Smart' }));
+    expect(document.activeElement).toBe(screen.getByRole('menuitemradio', { name: 'Everything' })); // SDS
   });
 
   it('lets Escape through when the menu is already closed', async () => {

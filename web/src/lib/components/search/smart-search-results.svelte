@@ -3,7 +3,9 @@
   import type { FilterState } from '$lib/components/filter-panel/filter-panel';
   import { dedupeAppend } from '$lib/utils/search-dedup';
   import { buildSmartSearchParams, SEARCH_FILTER_DEBOUNCE_MS } from '$lib/utils/space-search';
-  import { searchSmart, type AssetResponseDto } from '@immich/sdk';
+  import { globalSearchManager } from '$lib/managers/global-search-manager.svelte';
+  import { searchSmartOrAll } from '$lib/sds/hybrid-search';
+  import { type AssetResponseDto } from '@immich/sdk';
 
   interface Props {
     searchQuery: string;
@@ -86,7 +88,8 @@
 
     isLoading = true;
     try {
-      const { assets } = await searchSmart({
+      // SDS: in the Alles mode page 1 is the fused search (lib/sds/hybrid-search.ts)
+      const { assets } = await searchSmartOrAll(globalSearchManager.mode, {
         smartSearchDto: {
           ...buildSmartSearchParams({ query, filters, spaceId, albumIds, withSharedSpaces, language }),
           page,

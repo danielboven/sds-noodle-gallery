@@ -34,6 +34,7 @@ import { createFilterState } from '$lib/components/filter-panel/filter-panel';
 import { authManager } from '$lib/managers/auth-manager.svelte';
 import { featureFlagsManager } from '$lib/managers/feature-flags-manager.svelte';
 import { Route } from '$lib/route';
+import { sdsDefaultSearchMode, searchAllForPalette } from '$lib/sds/hybrid-search';
 import { searchPlacesWithPhotos } from '$lib/sds/place-search';
 import { addEntry, getEntries, makePlaceId, removeEntry, type RecentEntry } from '$lib/stores/cmdk-recent';
 import { getPhotosPersonFilterId, type PhotosPersonFilterReference } from '$lib/utils/photos-filter-options';
@@ -68,7 +69,7 @@ import { commandContextManager } from './command-context-manager.svelte';
 import { COMMAND_ITEMS, isAlmostExactCommandMatch, type CommandItem } from './command-items';
 import { isAlmostExactNavMatch, NAVIGATION_ITEMS, type NavigationItem } from './navigation-items';
 
-export type SearchMode = 'smart' | 'metadata' | 'description' | 'ocr';
+export type SearchMode = 'smart' | 'metadata' | 'description' | 'ocr' | 'all'; // SDS: 'all' = Alles
 export type SearchPresentation = 'modal' | 'dropdown';
 
 export type ProviderStatus<T = unknown> =
@@ -141,7 +142,7 @@ function selectedChoiceFromLiveChoice(
 type TopSearchMatch = { id: 'top-search'; query: string; rawQuery: string };
 type SearchBelowTopMatch = { id: 'top-search-below'; query: string; rawQuery: string };
 
-const VALID_MODES: ReadonlySet<SearchMode> = new Set(['smart', 'metadata', 'description', 'ocr']);
+const VALID_MODES: ReadonlySet<SearchMode> = new Set(['smart', 'metadata', 'description', 'ocr', 'all']); // SDS
 // Slice size for the albums section. Kept as a named constant so the buildProviders
 // `topN: 5` and the runAlbums slice cannot drift apart silently.
 const ALBUMS_TOP_N = 5;
@@ -280,6 +281,7 @@ function loadSearchQueryType(): SearchMode {
     return 'smart';
   }
   try {
+    sdsDefaultSearchMode(); // SDS
     const stored = localStorage.getItem('searchQueryType');
     if (stored && VALID_MODES.has(stored as SearchMode)) {
       return stored as SearchMode;
@@ -1708,7 +1710,7 @@ export class GlobalSearchManager {
     if (!trimmed) {
       return;
     }
-    if (mode === 'smart') {
+    if (mode === 'smart' || mode === 'all') {
       // Unreachable: navigateToFieldResults is only called for field modes.
       return;
     }
@@ -2856,6 +2858,9 @@ export class GlobalSearchManager {
       topN: 5,
       minQueryLength: 1,
       run: async (query, mode, signal) => {
+        if (mode === 'all') {
+          return searchAllForPalette(query, { withSharedSpaces: true, visibility: AssetVisibility.Timeline }, signal); // SDS
+        }
         try {
           if (mode === 'smart') {
             // withSharedSpaces:true mirrors Gallery's main search page so palette

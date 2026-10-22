@@ -526,6 +526,7 @@
   "cmdk_filter_match_timeout": "Zeitüberschreitung bei Treffern für {entity}",
   "cmdk_filter_use_as_filter": "Als Filter verwenden",
   "cmdk_helper": "Tippe los: Fotos, Personen, Orte, Tags.",
+  "cmdk_mode_all": "Alles",
   "cmdk_mode_description": "Beschreibung",
   "cmdk_mode_filename": "Dateiname",
   "cmdk_mode_ocr": "OCR",

@@ -300,7 +300,7 @@
         if (!globalSearchManager.isOpen) {
           return;
         }
-        const order: SearchMode[] = ['smart', 'metadata', 'description', 'ocr'];
+        const order: SearchMode[] = ['all', 'smart', 'metadata', 'description', 'ocr']; // SDS: 'all'
         const next = order[(order.indexOf(globalSearchManager.mode) + 1) % order.length];
         globalSearchManager.setMode(next);
       },

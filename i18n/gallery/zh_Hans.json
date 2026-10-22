@@ -528,6 +528,7 @@
   "cmdk_filter_match_timeout": "{entity} 匹配项加载超时",
   "cmdk_filter_use_as_filter": "用作筛选条件",
   "cmdk_helper": "开始输入：照片、人物、地点、标签。",
+  "cmdk_mode_all": "全部",
   "cmdk_mode_description": "描述",
   "cmdk_mode_filename": "文件名",
   "cmdk_mode_ocr": "OCR",

@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Истекло время ожидания совпадений: {entity}",
   "cmdk_filter_use_as_filter": "Использовать как фильтр",
   "cmdk_helper": "Начните вводить — фото, люди, места, теги.",
+  "cmdk_mode_all": "Всё",
   "cmdk_mode_description": "Описание",
   "cmdk_mode_filename": "Имя файла",
   "cmdk_mode_ocr": "OCR",

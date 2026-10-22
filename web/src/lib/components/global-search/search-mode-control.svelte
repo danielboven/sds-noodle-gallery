@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SearchMode } from '$lib/managers/global-search-manager.svelte';
   import { Icon } from '@immich/ui';
-  import { mdiChevronDown, mdiCreation, mdiFormatTitle, mdiOcr, mdiTextBoxOutline } from '@mdi/js';
+  import { mdiChevronDown, mdiCreation, mdiFormatTitle, mdiMagnify, mdiOcr, mdiTextBoxOutline } from '@mdi/js';
   import { t, type Translations } from 'svelte-i18n';
 
   interface Props {
@@ -22,6 +22,7 @@
   let { variant, mode, onSelect, scoped = false, smartUnavailable = false }: Props = $props();
 
   const options: Array<{ value: SearchMode; labelKey: Translations; icon: string }> = [
+    { value: 'all', labelKey: 'cmdk_mode_all' as Translations, icon: mdiMagnify }, // SDS
     { value: 'smart', labelKey: 'cmdk_mode_smart' as Translations, icon: mdiCreation },
     { value: 'metadata', labelKey: 'cmdk_mode_filename' as Translations, icon: mdiFormatTitle },
     { value: 'description', labelKey: 'cmdk_mode_description' as Translations, icon: mdiTextBoxOutline },

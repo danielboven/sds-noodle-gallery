@@ -35,7 +35,7 @@ const toPlaces = (markers: MapMarkerResponseDto[]) => {
   return [...places.values()];
 };
 
-const loadPlaces = () => {
+export const loadPhotoPlaces = () => {
   if (!cache || Date.now() - cache.loadedAt > CACHE_MS) {
     const places = getMapMarkers({ withSharedSpaces: true }).then(toPlaces);
     places.catch(() => (cache = undefined));
@@ -45,7 +45,7 @@ const loadPlaces = () => {
 };
 
 export const searchPlacesWithPhotos = async (query: string, { signal }: { signal?: AbortSignal } = {}) => {
-  const places = await loadPlaces();
+  const places = await loadPhotoPlaces();
   signal?.throwIfAborted();
   const search = normalizeSearchString(query);
   const startsWith = (place: Place) => Number(place.search.startsWith(search));

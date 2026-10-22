@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Se agotó el tiempo de espera de las coincidencias de {entity}",
   "cmdk_filter_use_as_filter": "Usar como filtro",
   "cmdk_helper": "Empieza a escribir: fotos, personas, lugares, etiquetas.",
+  "cmdk_mode_all": "Todo",
   "cmdk_mode_description": "Descripción",
   "cmdk_mode_filename": "Nombre de archivo",
   "cmdk_mode_ocr": "OCR",

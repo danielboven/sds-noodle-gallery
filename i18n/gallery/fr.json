@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Délai dépassé pour les correspondances {entity}",
   "cmdk_filter_use_as_filter": "Utiliser comme filtre",
   "cmdk_helper": "Commencez à taper : photos, personnes, lieux, étiquettes.",
+  "cmdk_mode_all": "Tout",
   "cmdk_mode_description": "Description",
   "cmdk_mode_filename": "Nom de fichier",
   "cmdk_mode_ocr": "OCR",

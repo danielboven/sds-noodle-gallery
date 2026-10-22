@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Ricerca delle corrispondenze di {entity} scaduta",
   "cmdk_filter_use_as_filter": "Usa come filtro",
   "cmdk_helper": "Inizia a digitare: foto, persone, luoghi, tag.",
+  "cmdk_mode_all": "Tutto",
   "cmdk_mode_description": "Descrizione",
   "cmdk_mode_filename": "Nome file",
   "cmdk_mode_ocr": "OCR",

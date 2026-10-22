@@ -542,7 +542,7 @@
       // by default (the @immich/ui shortcut action skips events whose target is an
       // input), so it won't fire while the palette's Command.Input is focused. Handle
       // the cycle here instead — same behavior, different listener.
-      const order: SearchMode[] = ['smart', 'metadata', 'description', 'ocr'];
+      const order: SearchMode[] = ['all', 'smart', 'metadata', 'description', 'ocr']; // SDS: 'all'
       const next = order[(order.indexOf(manager.mode) + 1) % order.length];
       manager.setMode(next);
       e.preventDefault();

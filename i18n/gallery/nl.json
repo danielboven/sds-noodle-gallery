@@ -524,6 +524,7 @@
   "cmdk_filter_match_timeout": "Overeenkomsten voor {entity} duurden te lang",
   "cmdk_filter_use_as_filter": "Als filter gebruiken",
   "cmdk_helper": "Begin met typen: foto's, mensen, plaatsen, tags.",
+  "cmdk_mode_all": "Alles",
   "cmdk_mode_description": "Beschrijving",
   "cmdk_mode_filename": "Bestandsnaam",
   "cmdk_mode_ocr": "OCR",
